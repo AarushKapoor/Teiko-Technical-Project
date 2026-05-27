@@ -77,7 +77,49 @@ for i, pop in enumerate(populations):
 plt.tight_layout()
 st.pyplot(fig)
 
-# Calculate p-values
-for pop in populations:
+cols = st.columns(5)
+
+# Calculate and display p-values
+for i, pop in enumerate(populations):
     stat, p = mannwhitneyu(data[pop]["yes"], data[pop]["no"])
-    st.write(f"**{pop}**: p-value = {p:.4f}")
+    cols[i].write(f"**{pop}**:  \np-value = {p:.4f}")
+
+st.header("Part 4 - Baseline Sample Analysis")
+
+# Create a view in the db for all samples with the given conditions
+cursor.executescript("""
+                DROP VIEW IF EXISTS baseline_samples;
+
+                CREATE VIEW baseline_samples AS
+                SELECT samples.*, subjects.response, subjects.sex, subjects.project
+                FROM samples
+                JOIN subjects ON samples.subject_id = subjects.subject_id
+                WHERE condition = 'melanoma'
+                AND treatment = 'miraclib'
+                AND sample_type = 'PBMC'
+                AND time_from_treatment_start = 0;
+               
+               """)
+
+baseline_df = pd.read_sql_query("SELECT * FROM baseline_samples", conn)
+st.dataframe(baseline_df)
+
+baseline_cols = st.columns(3)
+
+# Count how many of these samples are from each project
+cursor.execute("SELECT project, COUNT(*) FROM baseline_samples GROUP BY project")
+rows = cursor.fetchall()
+for row in rows:
+    baseline_cols[0].write(f"Samples from {row[0]}: {row[1]}")
+
+# Count how many of these samples are from responders/non-responders
+cursor.execute("SELECT response, COUNT(*) FROM baseline_samples GROUP BY response")
+rows = cursor.fetchall()
+for row in rows:
+    baseline_cols[1].write(f"Samples with response {row[0]}: {row[1]}")
+
+# Count how many of these samples are from males/females
+cursor.execute("SELECT sex, COUNT(*) FROM baseline_samples GROUP BY sex")
+rows = cursor.fetchall()
+for row in rows:
+    baseline_cols[2].write(f"Samples from {row[0]}: {row[1]}")
