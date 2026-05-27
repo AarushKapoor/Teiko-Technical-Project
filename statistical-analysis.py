@@ -52,3 +52,6 @@ plt.show()
 for pop in populations:
     stat, p = mannwhitneyu(data[pop]["yes"], data[pop]["no"])
     print(f"{pop}: p-value = {p:.4f}")
+
+# Close connection
+conn.close()
