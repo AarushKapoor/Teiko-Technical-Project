@@ -162,7 +162,7 @@ elif st.session_state.page == "project":
         st.write("""
                 These are the p-values comparing responders vs non-responders for each cell population. 
                 A p-value below 0.05 indicates that any difference between the two groups is statistically significant, 
-                and likely not due to randomness.
+                and likely not due to random chance.
                  """)
         
     # View for part 4 analysis
