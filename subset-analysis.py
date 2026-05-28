@@ -37,7 +37,7 @@ rows = cursor.fetchall()
 for row in rows:
     print(row)
 
-# Considering Melanoma males, what is the average number of B cells for responders at time=0?
+# Considering Melanoma males, what is the average number of B cells for responders at time=0? 10206.15
 cursor.execute("""
                 SELECT AVG(samples.b_cell)
                 FROM samples
